@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import cl.awakelabs.room.databinding.FragmentAddBinding
 import kotlinx.coroutines.GlobalScope
@@ -38,15 +39,17 @@ class AddFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
        binding = FragmentAddBinding.inflate(layoutInflater, container,false)
-        return binding.root
 
         initListener()
+        loadTasks()
+        return binding.root
     }
 
     private fun initListener() {
         binding.btnAdd.setOnClickListener {
             val texto = binding.editAdd.text.toString()
             saveTask(texto)
+            Toast.makeText(requireContext(), "se cargo correctamente", Toast.LENGTH_SHORT).show()
         }
 
     }
@@ -57,9 +60,19 @@ class AddFragment : Fragment() {
         val task = Task(texto,"fecha")
         GlobalScope.launch {  dao.insertTask(task) }
 
-
     }
 
+    private fun loadTasks() {
+        val dao = DbTask.getDatabase(requireContext()).getTaskDao()
+        GlobalScope.launch {
+            val tasks = dao.getTasks()
+            val taskAsText = tasks.joinToString("\n"){it.names}
+            binding.textView.text = taskAsText
+        }
+
+
+
+    }
 
     companion object {
         /**
