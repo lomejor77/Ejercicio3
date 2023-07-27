@@ -1,11 +1,13 @@
 package cl.awakelabs.room
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import cl.awakelabs.room.databinding.FragmentAddBinding
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -37,7 +39,27 @@ class AddFragment : Fragment() {
     ): View? {
        binding = FragmentAddBinding.inflate(layoutInflater, container,false)
         return binding.root
+
+        initListener()
     }
+
+    private fun initListener() {
+        binding.btnAdd.setOnClickListener {
+            val texto = binding.editAdd.text.toString()
+            saveTask(texto)
+        }
+
+    }
+
+    private fun saveTask(texto: String) {
+
+        val dao = DbTask.getDatabase(requireContext()).getTaskDao()
+        val task = Task(texto,"fecha")
+        GlobalScope.launch {  dao.insertTask(task) }
+
+
+    }
+
 
     companion object {
         /**

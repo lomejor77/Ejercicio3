@@ -1,7 +1,6 @@
 package cl.awakelabs.room
 
 import android.content.Context
-import android.provider.CalendarContract.Instances
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -11,11 +10,7 @@ abstract class DbTask: RoomDatabase() {
 
     abstract fun getTaskDao(): TaskDao
 
-    companion object{
-        @Volatile
-        private var INSTANCE: DbTask? = null
-
-        object {
+      companion object {
             @Volatile
             private var INSTANCE: DbTask? = null
 
@@ -36,6 +31,4 @@ abstract class DbTask: RoomDatabase() {
                 }
             }
         }
-
-    }
-}
+  }
