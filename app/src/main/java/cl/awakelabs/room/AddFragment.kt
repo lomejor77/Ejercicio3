@@ -6,9 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import cl.awakelabs.room.databinding.FragmentAddBinding
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -23,7 +22,8 @@ private const val ARG_PARAM2 = "param2"
 class AddFragment : Fragment() {
     // TODO: Rename and change types of parameters
     lateinit var binding: FragmentAddBinding
-    lateinit var repository: Repository
+    private val taskViewModel: TaskViewModel by activityViewModels()
+    //lateinit var repository: Repository
     private var param1: String? = null
     private var param2: String? = null
 
@@ -41,15 +41,15 @@ class AddFragment : Fragment() {
     ): View? {
        binding = FragmentAddBinding.inflate(layoutInflater, container,false)
 
-        initRepository()
+        //initRepository()
         initListener()
         loadTasks()
         return binding.root
     }
 
-    private fun initRepository(){
+   /* private fun initRepository(){
        repository = Repository(DbTask.getDatabase(requireContext()).getTaskDao())
-    }
+    }*/
 
     private fun initListener() {
         binding.btnAdd.setOnClickListener {
@@ -63,12 +63,13 @@ class AddFragment : Fragment() {
     private fun saveTask(texto: String) {
 
         val task = Task(texto,"fecha")
-        GlobalScope.launch {  repository.insertTask(task) }
+        taskViewModel.insertTask(task)
+        //GlobalScope.launch {  repository.insertTask(task) }
 
     }
 
     private fun loadTasks() {
-        repository.taskListed().observe(requireActivity()){
+      taskViewModel.obtainTask().observe(viewLifecycleOwner){
             val taskAsText = it.joinToString("\n"){it.names}
             binding.textView.text = taskAsText
         }
