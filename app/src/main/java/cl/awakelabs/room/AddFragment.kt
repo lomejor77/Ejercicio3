@@ -23,6 +23,7 @@ private const val ARG_PARAM2 = "param2"
 class AddFragment : Fragment() {
     // TODO: Rename and change types of parameters
     lateinit var binding: FragmentAddBinding
+    lateinit var repository: Repository
     private var param1: String? = null
     private var param2: String? = null
 
@@ -40,9 +41,14 @@ class AddFragment : Fragment() {
     ): View? {
        binding = FragmentAddBinding.inflate(layoutInflater, container,false)
 
+        initRepository()
         initListener()
         loadTasks()
         return binding.root
+    }
+
+    private fun initRepository(){
+       repository = Repository(DbTask.getDatabase(requireContext()).getTaskDao())
     }
 
     private fun initListener() {
@@ -56,21 +62,16 @@ class AddFragment : Fragment() {
 
     private fun saveTask(texto: String) {
 
-        val dao = DbTask.getDatabase(requireContext()).getTaskDao()
         val task = Task(texto,"fecha")
-        GlobalScope.launch {  dao.insertTask(task) }
+        GlobalScope.launch {  repository.insertTask(task) }
 
     }
 
     private fun loadTasks() {
-        val dao = DbTask.getDatabase(requireContext()).getTaskDao()
-        GlobalScope.launch {
-            val tasks = dao.getTasks()
-            val taskAsText = tasks.joinToString("\n"){it.names}
+        repository.taskListed().observe(requireActivity()){
+            val taskAsText = it.joinToString("\n"){it.names}
             binding.textView.text = taskAsText
         }
-
-
 
     }
 
